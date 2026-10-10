@@ -1,4 +1,4 @@
-# 🎓 CampusIQ — AI-Powered Student Analytics & Success Platform
+# 🎓 Gradewise-AI — AI-Powered Student Analytics & Success Platform
 
 > **Smart Campus Analytics: Predict, Optimize & Improve Student Success**  
 > *Recognizing high performers while actively accelerating medium-performing and struggling students through explainable AI roadmaps, trackable mentorship, and gamified mastery.*
