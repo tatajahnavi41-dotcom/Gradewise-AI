@@ -1,0 +1,7 @@
+student_id,lms_activity_score,engagement_score,assignments_completed,total_assignments
+AIML-001,92.0,88.5,12,12
+AIML-002,74.0,70.0,10,12
+AIDS-001,85.0,82.0,11,12
+AIDS-002,64.0,60.0,8,12
+CSE-001,95.0,91.0,12,12
+CSE-002,52.0,48.0,6,12
