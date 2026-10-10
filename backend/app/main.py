@@ -1,5 +1,8 @@
+import os
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.database import engine, Base, get_db
@@ -13,10 +16,11 @@ from app.api import (
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    description="CampusIQ — AI-Powered Student Analytics & Success Platform API",
+    description="Gradewise-AI — AI-Powered Student Analytics & Success Platform API",
     version="1.0.0",
     docs_url="/api/docs",
-    redoc_url="/api/redoc"
+    redoc_url="/api/redoc",
+    openapi_url="/api/openapi.json"
 )
 
 # Enable CORS for frontend Vite development server and production builds
@@ -82,3 +86,34 @@ def get_mongo_status():
 @app.post("/api/v1/mongo/sync")
 def sync_mongodb_atlas(db: Session = Depends(get_db)):
     return sync_data_to_mongo(db)
+
+# Check for production frontend build (supports unified full-stack deployments & Docker)
+_base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_candidates = [
+    os.path.join(_base_dir, "frontend", "dist"),
+    os.path.join(_base_dir, "frontend_dist"),
+    "/app/frontend_dist"
+]
+
+frontend_dist_path = None
+for _cand in _candidates:
+    if os.path.exists(_cand) and os.path.isdir(_cand):
+        frontend_dist_path = _cand
+        break
+
+if frontend_dist_path:
+    assets_dir = os.path.join(frontend_dist_path, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+    @app.get("/{full_path:path}")
+    def serve_spa_frontend(full_path: str):
+        if full_path.startswith("api") or full_path.startswith("docs") or full_path.startswith("redoc") or full_path.startswith("openapi.json"):
+            return {"error": "Not Found"}
+        target = os.path.join(frontend_dist_path, full_path)
+        if os.path.isfile(target):
+            return FileResponse(target)
+        index_file = os.path.join(frontend_dist_path, "index.html")
+        if os.path.isfile(index_file):
+            return FileResponse(index_file)
+        return {"platform": "Gradewise-AI API", "status": "operational"}

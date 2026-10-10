@@ -1,7 +1,7 @@
 services:
   # Backend Web Service (Render)
   - type: web
-    name: campusiq-backend
+    name: gradewise-ai-backend
     env: python
     buildCommand: "pip install -r backend/requirements.txt"
     startCommand: "cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
@@ -13,11 +13,15 @@ services:
 
   # Frontend Web Service (Render Static Site)
   - type: web
-    name: campusiq-frontend
+    name: gradewise-ai-frontend
     env: static
     buildCommand: "cd frontend && npm install && npm run build"
     staticPublishPath: "frontend/dist"
+    envVars:
+      - key: VITE_API_BASE
+        value: https://gradewise-ai-backend.onrender.com/api/v1
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
+
